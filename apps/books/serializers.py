@@ -3,9 +3,9 @@ from rest_framework import serializers
 from apps.books.models import Book
 
 
-class BookModelSerializers(serializers.ModelSerializer):
+class BookSerializers(serializers.ModelSerializer):
 
     class Meta:
-        model = Book  # 代表使用哪个模型类做校验
+        model = Book
         fields = '__all__'
 
