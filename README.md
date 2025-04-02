@@ -9,3 +9,8 @@ python, django, celery
 3. 提供借书、还书的 API
 4. 图书借阅期限为 30 天，每天 08:00 发通知将在 7 天内到期的图书借阅者，提醒还书
 5. 实现一个中间件，记录每个 API 请求的参数和耗时
+
+
+测试：
+celery -A library_management_system worker --pool=solo --loglevel=info
+pytest test/test_celery.py -s

@@ -51,3 +51,12 @@ class BookBorrowSerializers(serializers.ModelSerializer):
             raise serializers.ValidationError("该书已被借出，暂不可借")
         return attrs
 
+class BookRecordEditSerializers(serializers.ModelSerializer):
+    due_date = serializers.DateField(
+        required=True,
+        help_text="应还日期"
+    )
+
+    class Meta:
+        model = BookRecord
+        fields = ['due_date']

@@ -1,6 +1,7 @@
 import logging
 
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 
 from apps.users.models import User
@@ -43,6 +44,31 @@ class UserApiview(APIView):
                 )
         except Exception as e:
             logger.exception("Internal Server Error")
+            return JsonResponse(
+                ObjectResp.response(code=500, message="服务器内部错误"),
+                status=500
+            )
+
+
+class UserEditApiview(APIView):
+    def put(self, request, user_id):
+        try:
+            user = get_object_or_404(User, id=user_id)
+            ser = UserSerializers(
+                instance=user,
+                data=request.data
+            )
+            if ser.is_valid():
+                ser.save()
+                return JsonResponse(ObjectResp.response(code=200, message='success'))
+            else:
+                logger.error(f"Validation Error: {ser.errors}")
+                return JsonResponse(
+                    ObjectResp.response(code=400, message='数据验证失败', details=ser.errors),
+                    status=400
+                )
+        except Exception as e:
+            logger.exception("Full Update Error")
             return JsonResponse(
                 ObjectResp.response(code=500, message="服务器内部错误"),
                 status=500

@@ -1,9 +1,9 @@
-{# overdue_reminder.html #}
 <!DOCTYPE html>
 <html>
 <body>
-  <p>尊敬的 {{ user.username }}：</p>
-  <p>您借阅的图书《{{ book.title }}》将在 {{ due_date|date:"Y-m-d" }} 到期（剩余 {{ days_left }} 天），请及时归还！</p>
-  <p>图书馆管理系统</p>
+  <p>尊敬的 {{ username }}：</p>
+{#  <p>您借阅的图书《{{ book_title }}》将在 {{ due_date|date:"Y-m-d" }} 到期，请及时归还！</p>#}
+  <p>您借阅的图书《{{ book_title }}》将在 {{ due_date }} 到期，请及时归还！</p>
+  <p>--图书管理系统</p>
 </body>
 </html>

@@ -50,6 +50,7 @@ class BookApiview(APIView):
                 status=500
             )
 
+
 class BookEditApiview(APIView):
     def put(self, request, book_id):
         try:
@@ -73,6 +74,8 @@ class BookEditApiview(APIView):
                 ObjectResp.response(code=500, message="服务器内部错误"),
                 status=500
             )
+
+
 class BookDestructionApiview(APIView):
 
     def patch(self, request, book_id):
@@ -92,5 +95,3 @@ class BookDestructionApiview(APIView):
                 ObjectResp.response(code=500, message="服务器内部错误"),
                 status=500
             )
-
-

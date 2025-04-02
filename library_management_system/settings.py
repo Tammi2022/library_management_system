@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 
+from celery.schedules import crontab
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -38,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'apps.books',
     'apps.book_record',
-    'apps.users'
+    'apps.users',
+    'library_management_system.tasks',
 ]
 
 MIDDLEWARE = [
@@ -80,6 +83,18 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.getenv('REDIS_LOCATION', "redis://127.0.0.1:6379/1"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "REDIS_CLIENT_KWARGS": {
+                "health_check_interval": 30
+            },
+        }
     }
 }
 
@@ -246,3 +261,26 @@ LOGGING = {
 }
 
 CORE_ORIGIN_ALLOW_ALL = True
+
+# 邮件配置
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.163.com'  # 注意不要有空格或特殊字符
+EMAIL_PORT = 465  # 163 邮箱 SSL 端口
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = 'tammii@163.com'
+EMAIL_HOST_PASSWORD = ''
+DEFAULT_FROM_EMAIL = '图书馆系统 <tammii@163.com>'
+# Celery 配置
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # 使用 Redis
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
+CELERY_TIMEZONE = 'Asia/Shanghai'  # 设置时区
+CELERY_BEAT_SCHEDULE = {
+    'send-due-reminders': {
+        'task': 'library_management_system.tasks.send_reminders',
+        'schedule': crontab(hour=23, minute=4),  # 每天早8点
+        'options': {'expires': 30.0}  # 任务超时时间
+    },
+}
+
+TIME_ZONE = 'Asia/Shanghai'  # 与你的实际时区一致
+USE_TZ = True

@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from django.db import models
 
 from apps.books.models import Book
@@ -12,6 +11,7 @@ class BookRecord(TimeMixin):  # 图书借阅记录
     borrow_date = models.DateTimeField('借出时间', auto_now_add=True)
     due_date = models.DateField('应还日期')
     return_date = models.DateField('归还时间', null=True, blank=True)
+    last_reminder = models.DateField('系统提醒时间', null=True, blank=True)
     STATUS_CHOICES = (
         (1, '借出'),
         (2, '归还'),

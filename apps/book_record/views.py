@@ -5,7 +5,7 @@ from django.utils import timezone
 from rest_framework.views import APIView
 
 from apps.book_record.models import BookRecord
-from apps.book_record.serializers import BookRecordShowSerializers, BookBorrowSerializers
+from apps.book_record.serializers import BookRecordShowSerializers, BookBorrowSerializers, BookRecordEditSerializers
 from apps.books.models import Book
 from apps.utils.data_serializer import SerializerUtils
 from apps.utils.obj_response import ObjectResp
@@ -24,6 +24,35 @@ class BookRecordApiview(APIView):
         response_dict = ObjectResp.response(code=200, message='success', ls=data)
         return JsonResponse(response_dict)
 
+class BookRecordDetailsApiview(APIView):
+
+    def patch(self, request, record_id):
+        try:
+            record = BookRecord.objects.get(id=record_id, status=1)
+            ser = BookRecordEditSerializers(instance=record, data=request.data)
+            if not ser.is_valid():
+                return JsonResponse(
+                    ObjectResp.response(code=400, message='数据验证失败', details=ser.errors),
+                    status=400
+                )
+            ser.save()
+            return JsonResponse(ObjectResp.response(code=200, message='success'))
+        except BookRecord.DoesNotExist:
+            return JsonResponse(
+                ObjectResp.response(code=404, message='error', details='借阅记录不存在或已归还'),
+                status=400
+            )
+        except Book.DoesNotExist:
+            return JsonResponse(
+                ObjectResp.response(code=404, message='error', details='图书不存在或已销毁'),
+                status=400
+            )
+        except Exception as e:
+            logger.exception("Internal Server Error")
+            return JsonResponse(
+                ObjectResp.response(code=500, message="服务器内部错误"),
+                status=500
+            )
 
 class BookBorrowView(APIView):
     """借书接口"""
