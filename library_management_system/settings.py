@@ -47,6 +47,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'apps.utils.middleware.APILoggingMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -156,12 +157,32 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
-        'standard': {
-            'format': '%(asctime)s [%(threadName)s:%(thread)d] [%(name)s:%(lineno)d] [%(levelname)s]- %(message)s',
-            'datefmt': "%d/%b/%Y %H:%M:%S"
+         'json': {
+            '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+            'format': '%(asctime)s %(levelname)s %(message)s'
         },
+        'flat_json': {
+            '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+            # 禁用默认字段，自定义字段映射
+            'format': '%(timestamp)s %(level)s %(method)s %(path)s',
+            # 保留原始字典结构
+            'json_ensure_ascii': False,
+            'json_indent': None  # 生产环境建议关闭缩进
+        },
+        'standard': {  # 新增标准格式化器
+            'format': '[%(asctime)s] [%(levelname)s] %(name)s: %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S'  # 必须添加时间格式
+        }
     },
     'handlers': {
+        'api_file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',  # 修正拼写错误
+            'filename': os.path.join(BASE_DIR, 'logs/api_monitor.log'),  # 使用相对路径
+            'when': 'midnight',
+            'backupCount': 7,
+            'formatter': 'flat_json',
+        },
         'default': {
             'level': 'DEBUG',
             'class': 'logging.handlers.TimedRotatingFileHandler',  # 处理的类，处理日志的规则
@@ -216,6 +237,11 @@ LOGGING = {
             'level': 'DEBUG',  # 确保记录所有级别日志
             'propagate': False,
         },
+        'api.monitor': {  # 与中间件中名称一致
+            'handlers': ['api_file'],
+            'level': 'INFO',
+            'propagate': False,
+        }
     }
 }
 
