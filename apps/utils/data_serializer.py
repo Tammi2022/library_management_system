@@ -1,12 +1,6 @@
-import json
 import logging
-import re
-from datetime import datetime
-from decimal import Decimal
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from rest_framework import serializers
 
-from apps.utils.error_util import BadRequestError
 
 logger = logging.getLogger('utils')
 

@@ -17,8 +17,8 @@ class ObjectResp:
             'message': message,
             'data': response
         }
-        # if code == 200:
-        #     transaction.commit()
-        # else:
-        #     transaction.rollback()
+        if code == 200:
+            transaction.commit()
+        else:
+            transaction.rollback()
         return result

@@ -5,7 +5,6 @@ from rest_framework.views import APIView
 
 from apps.users.models import User
 from apps.users.serializers import UserSerializers
-from apps.utils import api_error
 from apps.utils.data_serializer import SerializerUtils
 from apps.utils.obj_response import ObjectResp
 
@@ -13,7 +12,6 @@ logger = logging.getLogger('apps')
 
 
 class UserApiview(APIView):
-    @api_error.handle_api_error
     def get(self, request):
         instance = User.objects.all()
         page = request.GET.get('page', 1)
@@ -24,6 +22,28 @@ class UserApiview(APIView):
         response_dict = ObjectResp.response(code=200, message='success', ls=data)
         return JsonResponse(response_dict)
 
-    @api_error.handle_api_error
     def post(self, request):
-        pass
+        try:
+            # 检查是否有请求数据
+            if not request.data:
+                logger.error("Request data is empty.")
+                return JsonResponse(
+                    ObjectResp.response(code=400, message="请求数据为空"),
+                    status=400
+                )
+            ser = UserSerializers(data=request.data)
+            if ser.is_valid():
+                ser.save()
+                return JsonResponse(ObjectResp.response(code=200, message='success'))
+            else:
+                logger.error(f"Validation Error: {ser.errors}")
+                return JsonResponse(
+                    ObjectResp.response(code=400, message='数据验证失败', details=ser.errors),
+                    status=400
+                )
+        except Exception as e:
+            logger.exception("Internal Server Error")
+            return JsonResponse(
+                ObjectResp.response(code=500, message="服务器内部错误"),
+                status=500
+            )

@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-(6!*vspu&4v2w35*jsk$zx=b6q5g(@daw1e0ef%ft^3wnxiuqt
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -70,7 +70,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'library_management_system.wsgi.application'
-
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -211,8 +212,9 @@ LOGGING = {
             'propagate': False
         },
         'apps': {
-            'handlers': ['default', 'console'],
-            'level': 'INFO'
+            'handlers': ['errMsg', 'console'],  # 添加 'errMsg' 处理器
+            'level': 'DEBUG',  # 确保记录所有级别日志
+            'propagate': False,
         },
     }
 }

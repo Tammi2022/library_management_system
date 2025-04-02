@@ -12,7 +12,11 @@ class BookRecord(TimeMixin):  # 图书借阅记录
     borrow_date = models.DateTimeField('借出时间', auto_now_add=True)
     due_date = models.DateField('应还日期')
     return_date = models.DateField('归还时间', null=True, blank=True)
-    renew_count = models.PositiveIntegerField('续借次数', default=0)
+    STATUS_CHOICES = (
+        (1, '借出'),
+        (2, '归还'),
+    )
+    status = models.IntegerField('状态', choices=STATUS_CHOICES, default=1)
 
     def __str__(self):
         return f"{self.user.username} - {self.book}"
